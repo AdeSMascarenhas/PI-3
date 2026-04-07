@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Alexandria | Início{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-indigo-50 via-white to-gray-100 py-20 md:py-28">
+    <div class="container mx-auto px-5 text-center md:text-left md:flex md:items-center md:justify-between">
+        <div class="md:w-1/2 space-y-6">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800">
+                Encontre meios para <br> <span class="text-indigo-600">doar, trocar ou obter</span>, <br> livros <span class="text-indigo-600">do seu interesse!</span>
+            </h1>
+            <p class="text-lg text-gray-600 max-w-lg mx-auto md:mx-0">
+                Junte-se à maior comunidade de troca de livros do Brasil. 
+                Encontre novos mundos nas prateleiras de outros leitores.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <a href="{% url 'explorar' %}" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-indigo-700 transition-smooth text-center">Quero trocar livros</a>
+                <a href="{% url 'como-funciona' %}" class="border border-indigo-300 text-indigo-700 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-smooth text-center">Saiba mais</a>
+            </div>
+            <p class="text-sm text-gray-500">⭐ +2.500 livros disponíveis • 12 regiões de SP</p>
+        </div>
+        <div class="md:w-1/2 mt-12 md:mt-0 flex justify-center">
+            <img src="https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Ilustração de livros" class="rounded-2xl shadow-xl">
+        </div>
+    </div>
+</section>
+
+<!-- Cards de Regiões -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-5">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Explore por <span class="text-indigo-600">região</span></h2>
+            <p class="text-gray-500 mt-2">Livros perto de você, em São Paulo e Grande SP.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-smooth">
+                <div class="text-3xl mb-3">📍</div>
+                <h3 class="font-bold text-xl">Norte 1</h3>
+                <p class="text-gray-500 text-sm mt-1">Santana, Tucuruvi, Jaçanã...</p>
+                <a href="{% url 'livros-por-regiao' regiao='NORTE 1' %}" class="text-indigo-600 text-sm font-medium mt-3 inline-block">Ver livros →</a>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-smooth">
+                <div class="text-3xl mb-3">📍</div>
+                <h3 class="font-bold text-xl">Sul / Sudoeste</h3>
+                <p class="text-gray-500 text-sm mt-1">Moema, Brooklin, Santo Amaro...</p>
+                <a href="{% url 'livros-por-regiao' regiao='SUL' %}" class="text-indigo-600 text-sm font-medium mt-3 inline-block">Ver livros →</a>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-smooth">
+                <div class="text-3xl mb-3">📍</div>
+                <h3 class="font-bold text-xl">Leste 1 / 2</h3>
+                <p class="text-gray-500 text-sm mt-1">Tatuapé, Itaquera, Penha...</p>
+                <a href="{% url 'livros-por-regiao' regiao='LESTE 1' %}" class="text-indigo-600 text-sm font-medium mt-3 inline-block">Ver livros →</a>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-smooth">
+                <div class="text-3xl mb-3">📍</div>
+                <h3 class="font-bold text-xl">Região Metropolitana</h3>
+                <p class="text-gray-500 text-sm mt-1">Guarulhos, ABC, Osasco...</p>
+                <a href="{% url 'livros-por-regiao' regiao='REGIAO METROPOLITANA' %}" class="text-indigo-600 text-sm font-medium mt-3 inline-block">Ver livros →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Como Funciona -->
+<section class="py-16 bg-indigo-50">
+    <div class="container mx-auto px-5">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <h2 class="text-3xl font-bold">📖 Como funciona a troca?</h2>
+            <p class="text-gray-600 mt-2">Simples, rápido e colaborativo</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8 text-center">
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-indigo-700">1</div>
+                <h3 class="font-bold text-xl mt-4">Cadastre seus livros</h3>
+                <p class="text-gray-500 mt-2">Adicione os livros que você quer doar ou trocar com estado de conservação.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-indigo-700">2</div>
+                <h3 class="font-bold text-xl mt-4">Encontre interessados</h3>
+                <p class="text-gray-500 mt-2">Explore por região ou gênero e conecte com outros leitores.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <div class="text-4xl bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-indigo-700">3</div>
+                <h3 class="font-bold text-xl mt-4">Combine e troque</h3>
+                <p class="text-gray-500 mt-2">Marque um ponto de encontro e compartilhe histórias.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimento 
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-5 max-w-4xl">
+        <div class="bg-gray-50 rounded-2xl p-8 md:p-12 shadow-sm border-l-8 border-indigo-500">
+            <p class="text-xl md:text-2xl italic text-gray-700">"Troquei 5 livros no último mês e conheci pessoas incríveis. A Alexandria transformou minha estante em uma ponte de conexões."</p>
+            <div class="flex items-center gap-4 mt-6">
+                <div class="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold text-xl">A</div>
+                <div>
+                    <p class="font-bold">Ana Carolina</p>
+                    <p class="text-sm text-gray-500">Leitora ávida • Zona Sul</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+-->
+{% endblock %}
