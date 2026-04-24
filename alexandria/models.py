@@ -8,6 +8,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 import requests
 import datetime
 
@@ -116,6 +118,18 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return self.administrador or self.moderador
+    
+    # Atualizar média de usuário
+    def atualizar_rating(self):
+        from django.db.models import Avg
+
+        media = Troca.objects.filter(
+            id_dono=self,
+            avaliacao__isnull=False
+        ).aggregate(media=Avg('avaliacao'))['media']
+
+        self.rating = media
+        self.save(update_fields=['rating'])
 
 class Livro(models.Model):
     ESTADO_CHOICES = [
@@ -152,50 +166,50 @@ class Livro(models.Model):
         verbose_name = 'Livro'
         verbose_name_plural = 'Livros'
 
-    def get_queryset(self):
-        queryset = Livro.objects.filter(disponivel=True) \
-                                 .exclude(titulo__isnull=True) \
-                                 .exclude(titulo__exact='') \
-                                 .select_related('id_dono')
+    # def get_queryset(self):
+    #     queryset = Livro.objects.filter(disponivel=True) \
+    #                              .exclude(titulo__isnull=True) \
+    #                              .exclude(titulo__exact='') \
+    #                              .select_related('id_dono')
 
-        # Filtro de busca (título ou autor)
-        search = self.request.GET.get('search', '').strip()
-        if search:
-            queryset = queryset.filter(
-                Q(titulo__icontains=search) | Q(autor__icontains=search)
-            )
+    #     # Filtro de busca (título ou autor)
+    #     search = self.request.GET.get('search', '').strip()
+    #     if search:
+    #         queryset = queryset.filter(
+    #             Q(titulo__icontains=search) | Q(autor__icontains=search)
+    #         )
 
-        # Filtro por região (baseada no dono do livro)
-        regiao = self.request.GET.get('regiao', '')
-        if regiao and regiao != 'todas':
-            queryset = queryset.filter(id_dono__regiao=regiao)
+    #     # Filtro por região (baseada no dono do livro)
+    #     regiao = self.request.GET.get('regiao', '')
+    #     if regiao and regiao != 'todas':
+    #         queryset = queryset.filter(id_dono__regiao=regiao)
 
-        # Filtro por estado de conservação
-        estado = self.request.GET.get('estado', '')
-        if estado and estado != 'todos':
-            queryset = queryset.filter(estado=estado)
+    #     # Filtro por estado de conservação
+    #     estado = self.request.GET.get('estado', '')
+    #     if estado and estado != 'todos':
+    #         queryset = queryset.filter(estado=estado)
 
-        # Filtro por tipo (troca/doação)
-        tipo = self.request.GET.get('tipo', '')
-        if tipo == 'doacao':
-            queryset = queryset.filter(em_doacao=True)
-        elif tipo == 'troca':
-            queryset = queryset.filter(em_doacao=False)
+    #     # Filtro por tipo (troca/doação)
+    #     tipo = self.request.GET.get('tipo', '')
+    #     if tipo == 'doacao':
+    #         queryset = queryset.filter(em_doacao=True)
+    #     elif tipo == 'troca':
+    #         queryset = queryset.filter(em_doacao=False)
 
-        return queryset
+    #     return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Preserva os filtros atuais no template para manter os valores nos campos
-        context['filtros'] = {
-            'search': self.request.GET.get('search', ''),
-            'regiao': self.request.GET.get('regiao', ''),
-            'estado': self.request.GET.get('estado', ''),
-            'tipo': self.request.GET.get('tipo', ''),
-        }
-        # Lista de regiões para o dropdown (vinda do modelo Usuario)
-        context['regioes'] = Usuario._meta.get_field('regiao').choices
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     # Preserva os filtros atuais no template para manter os valores nos campos
+    #     context['filtros'] = {
+    #         'search': self.request.GET.get('search', ''),
+    #         'regiao': self.request.GET.get('regiao', ''),
+    #         'estado': self.request.GET.get('estado', ''),
+    #         'tipo': self.request.GET.get('tipo', ''),
+    #     }
+    #     # Lista de regiões para o dropdown (vinda do modelo Usuario)
+    #     context['regioes'] = Usuario._meta.get_field('regiao').choices
+    #     return context
 
     def populate_with_api(self):
         raw_olid = self.cod_api.strip()
@@ -396,6 +410,33 @@ class Troca(models.Model):
         verbose_name='Livro em transação'
     )
     data_troca = models.DateField(default=timezone.now, verbose_name='Data da troca')
+
+    # Avaliações
+    avaliacao_dono = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name='Avaliação do dono sobre o interessado'
+    )
+
+    avaliacao_interessado = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name='Avaliação do interessado sobre o dono'
+    )
+
+    # Acho interessante pensar em um campo para Comentários
+    comentario_dono = models.TextField(null=True, blank=True)
+    comentario_interessado = models.TextField(null=True, blank=True)
+
+    # Save e Rating (executa o save e caso tenha avaliação, atualiza)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Atualiza rating do dono
+        if self.avaliacao is not None:
+            self.id_dono.atualizar_rating()
 
     class Meta:
         db_table = 'troca'
