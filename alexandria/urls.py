@@ -18,16 +18,23 @@ from django.contrib import admin
 from django.urls import path
 
 from alexandria.views.home import Home
+from alexandria.views.explore import Explore
+from alexandria.views.auth import SigninView, LoginView, ProcessLogin, ProcessSignin, LogoutView
+from alexandria.views.profile import ProfileView
+
 
 urlpatterns = [
     path("", Home.as_view(), name="home"),
     path('admin/', admin.site.urls),
-    path('explorar/', Home.as_view(), name='explorar'),
+    path('explorar/', Explore.as_view(), name='explorar'),
     path('como-funciona/', Home.as_view(), name='como-funciona'),
     path('comunidade/', Home.as_view(), name='comunidade'),
-    path('login/', Home.as_view(), name='login'),
-    path('logout/', Home.as_view(), name='logout'),
-    path('perfil/', Home.as_view(), name='perfil'),
+    path('signin/', SigninView.as_view(), name='signin'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('auth/login/', ProcessLogin.as_view(), name='auth_login'),
+    path('auth/signin/', ProcessSignin.as_view(), name='auth_signin'),
+    path('perfil/', ProfileView.as_view(), name='perfil'),
     path('regioes/', Home.as_view(), name='regioes'),
     path('regiao/<str:regiao>/', Home.as_view(), name='livros-por-regiao'),
     path('termos/', Home.as_view(), name='termos'),
